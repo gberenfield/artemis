@@ -1,6 +1,5 @@
 Artemis
 =======
-
 Nifty prompt for searching strings.
 
 Features
@@ -14,3 +13,11 @@ Building
 ========
 gcc main.c -ncurses -o artemis
 
+License
+=======
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Copyright
+=========
+Greg Berenfield 2013
