@@ -192,9 +192,9 @@ void get_current()
       if (showing) clrtobot();
       showing=FALSE;
     }
+    lc = c;
   }
   current[i] = '\0';
-  lc = c;
 }
 
 int main(int argc, const char * argv[])
@@ -217,6 +217,7 @@ int main(int argc, const char * argv[])
   getch();
   endwin();
 
+  printf("%s\n",choice);
   return 0;
 }
 
