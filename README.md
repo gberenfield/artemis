@@ -15,6 +15,11 @@ Building
 ========
 gcc main.c -ncurses -o artemis
 
+Todo
+====
+Make enter of selecting string put it in 'selection buffer' and offer
+new blank current prompt
+
 License
 =======
 GNU GENERAL PUBLIC LICENSE  
