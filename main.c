@@ -152,6 +152,19 @@ void tab_hits_down() {
     move(cursor_row,cursor_col);
   }
 }
+void tab_hits_up() {
+  if (sel_match > 0) {
+    sel_match--;
+    move (hit_row,hit_col);
+    printw(tags[matches[sel_match+1].index]);
+    move (--hit_row,hit_col);
+    clrtoeol();
+    attron(A_REVERSE);
+    printw(tags[matches[sel_match].index]);
+    attroff(A_REVERSE);
+    move(cursor_row,cursor_col);
+  }
+}
 
 void get_current()
 {
@@ -175,6 +188,7 @@ void get_current()
       }
     }
     else if (c == 'J') tab_hits_down();
+    else if (c == 'K') tab_hits_up();
     else if (c == 127 || c == 8) { // delete or backspace
       backspace();
       i--;
