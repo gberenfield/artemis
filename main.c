@@ -178,7 +178,7 @@ void get_current()
   {
     getsyx(cursor_row,cursor_col);
     if (c == '\t') {
-      if (lc == '\t') { tab_hits_down(); }
+      if (lc == '\t' || lc == 'J') { tab_hits_down(); }
       else {
         clrtobot();
         if (strlen(current)>1) {
@@ -188,7 +188,7 @@ void get_current()
       }
     }
     else if (c == 'J') tab_hits_down();
-    else if (c == 'K') tab_hits_up();
+    else if (c == 'K' || c == 353) tab_hits_up();
     else if (c == 127 || c == 8) { // delete or backspace
       backspace();
       i--;
