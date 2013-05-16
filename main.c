@@ -2,9 +2,7 @@
 //  main.c
 //  artemis
 //
-//  Created by Greg Berenfield on 5/14/13.
-//
-//
+//  Copyright 2013 Greg Berenfield
 
 #include <stdio.h>
 #include <string.h>
@@ -105,18 +103,18 @@ void hunt_current()
 void show_hits()
 {
   int i=0;
-  char a[128],b[128];
+  char front[128],back[128];
 
   while (matches[i].index > -1) {
-    memset(a,'\0',128);
-    memset(b,'\0',128);
-    strncpy(a,tags[matches[i].index],matches[i].sloc-tags[matches[i].index]);
-    strcpy(b,&tags[matches[i].index][strlen(a)+strlen(current)]);
-    mvprintw((cursor_row+2+i),cursor_col,"%s",a);
+    memset(front,'\0',128);
+    memset(back,'\0',128);
+    strncpy(front,tags[matches[i].index],matches[i].sloc-tags[matches[i].index]);
+    strcpy(back,&tags[matches[i].index][strlen(front)+strlen(current)]);
+    mvprintw((cursor_row+2+i),cursor_col,"%s",front);
     attron(A_BOLD);
     printw("%s",current);
     attroff(A_BOLD);
-    printw("%s",b);
+    printw("%s",back);
     ++i;
   }
   showing=TRUE;
