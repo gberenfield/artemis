@@ -4,10 +4,12 @@ Nifty prompt for searching strings.
 
 Features
 ========
-* Small/fast/low-dependency (ncurses)
-* Strings from flat-file or stdin
-* Dumps choice to stdout or file
+* small/fast/low-dependency (ncurses)
+* strings from flat-file or stdin
+* dumps choice to stdout or file
 * tab-completion of strings/searching
+* searching case-insensitive
+* arrow-up/down or Shift-J,K to scroll through results
 
 Building
 ========
