@@ -22,6 +22,7 @@ Todo
 * ESC-some key to reset search quickly
 * dynamic memory mgmt
 * command-line arguments/file-io
+* demo
 
 License
 =======
