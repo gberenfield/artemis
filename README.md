@@ -16,14 +16,17 @@ Features / Docs
 
 Building
 ========
-gcc main.c -ncurses -o artemis
+    gcc main.c -ncurses -o artemis
+
+Demo
+====
+    ./artemis -f demo.txt
+Then try typing "ge<return><return"
 
 Todo
 ====
-* dynamic memory mgmt
-* command-line arguments/file-io
+* dynamic memory mgmt: tags,match
 * search the hits after tab-list (search matches)
-* demo
 * ansi color?
 
 License
