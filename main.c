@@ -8,7 +8,6 @@
 #include <string.h>
 #include <ncurses.h>
 
-#define FILENAME "/Users/mc/.mutt/tags"
 #define MAX_LINE 128
 
 struct match {
@@ -16,17 +15,18 @@ struct match {
   char *sloc;
 };
 
-char current[MAX_LINE];       // The current text being typed for search
-int num_tags;                 // The file length of the tags file (# of tags)
+char infile[128],outfile[128];     // input and output filenames
+char current[MAX_LINE];            // The current text being typed for search
+int num_tags;                      // The file length of the tags file (# of tags)
 int row,col,cursor_row,cursor_col,hit_row,hit_col;
-bool showing;                 // Are we displaying the hunt_list ?
+bool showing;                      // Are we displaying the hunt_list ?
 WINDOW *mywin;
 char tags[1000][MAX_LINE];
 struct match matches[100];
-int sel_match;                // currently selected match
-int num_matches;              // number of matches
-char *choice;                 // choice of selection/typing
-char items[MAX_LINE*2];       // all choices, space-delimited
+int sel_match;                     // currently selected match
+int num_matches;                   // number of matches
+char *choice;                      // choice of selection/typing
+char items[MAX_LINE*2];            // all choices, space-delimited
 
 int flen(char fname[])
 {
@@ -47,16 +47,21 @@ int flen(char fname[])
 void get_file(char tags[][MAX_LINE])
 {
   FILE *inFile;
-  int lineCount,i;
-  inFile = fopen(FILENAME, "r");
+  int i;
 
-  /* lineCount = flen(FILENAME); */
-  /* char tags[lineCount][MAX_LINE]; */
-
-  fopen(FILENAME, "r");
+  inFile = fopen(infile, "r");
   for(i = 0; i < num_tags; i++)
     fscanf(inFile, "%s", tags[i]);
   fclose(inFile);
+}
+
+void put_file()
+{
+  FILE *File;
+  File = fopen(outfile, "w");
+
+  fprintf(File, "%s\n", items);
+  fclose(File);
 }
 
 void setup_screen() /* print the message at the center of the screen */
@@ -199,7 +204,8 @@ void get_current()
   {
     getsyx(cursor_row,cursor_col);
     /* diag(c); */
-    if (c == '\t') { // Tab or 'J'
+    if (c == '\t')                                // Tab
+    {
       if (lc == '\t' || showing || lc == 'J' || lc == 353 || lc == 'K') { tab_hits_down(); }
       else {
         clrtobot();
@@ -209,10 +215,11 @@ void get_current()
         }
       }
     }
-    else if (c == '\n' && lc == '\n') break;
-    else if (c == 'J') tab_hits_down();
-    else if (c == 'K' || c == 353) tab_hits_up();
-    else if (c == 32) { // SPACE to reset search
+    else if (c == '\n' && lc == '\n') break;      // two-returns to quit
+    else if (c == 'J') tab_hits_down();           // J down hit list
+    else if (c == 'K' || c == 353) tab_hits_up(); // K | <shift-TAB> up hit list
+    else if (c == 32)                             // SPACE to reset search
+    {
       memset(current,'\0',MAX_LINE);
       clear_matches();
       setup_screen();
@@ -220,7 +227,8 @@ void get_current()
       move(cursor_row,cursor_col+3);
       i=0;
     }
-    else if (c == 127 || c == 8) { // DELETE or BACKSPACE
+    else if (c == 127 || c == 8)                  // DELETE or BACKSPACE
+    {
       backspace();
       i--;
       current[i] = '\0';
@@ -232,7 +240,7 @@ void get_current()
         show_hits();
       }
     }
-    else if (c=='\n') // select hightlighted hit or typed word
+    else if (c=='\n')                             // SELECT hightlighted hit or typed word
     {
       if (showing && sel_match>-1) strcat(items,tags[matches[sel_match].index]);
       else strcat(items,current);
@@ -242,7 +250,8 @@ void get_current()
       mvprintw(LINES - 2, 0, "!: %s", items);
       move(cursor_row,cursor_col);
     }
-    else {
+    else                                          // regular key-typed
+    {
       addch(c);
       current[i]=c;
       i++;
@@ -264,21 +273,48 @@ void get_current()
   current[i] = '\0';
 }
 
+void show_basics()
+{
+  printf("artemis - (C) 2013 Greg Berenfield\nReleased under the GNU GPL.\n\nUsage: artemis [-o <output>] [-f <word-file> | \"string of words\"]\n");
+}
+
 int main(int argc, const char * argv[])
 {
-  num_tags=flen(FILENAME);
-  get_file(tags);
+  int i;
+  if (argc==1) {
+    show_basics();
+    return 0;
+  }
+  for (i = 1; i < argc; i++) {
+    if (argv[i][0] == '-') {
+      switch (argv[i][1]) {
+        case 'f':strcpy(infile,argv[++i]); break;
+        case 'o':strcpy(outfile,argv[++i]); break;
+      }
+    }
+  }
+
+  if (strlen(infile)>0) {
+    num_tags=flen(infile);
+    get_file(tags);
+  }
+  else {
+
+  }
 
   setup_screen();
   get_current();
-
+  items[strlen(items)-1]='\0';
   endwin();
 
   if (showing && sel_match>-1) {
     choice = items;
   }
   else choice = current;
-  printf("%s\n",items);
+
+  if (strlen(outfile)>0) put_file();
+  else printf("%s\n",items);
+
   return 0;
 }
 
