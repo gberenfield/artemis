@@ -26,7 +26,7 @@ struct match matches[100];
 int sel_match;                // currently selected match
 int num_matches;              // number of matches
 char *choice;                 // choice of selection/typing
-char items[MAX_LINE];       // all choices, space-delimited
+char items[MAX_LINE*2];       // all choices, space-delimited
 
 int flen(char fname[])
 {
@@ -123,6 +123,7 @@ void show_hits()
 {
   int i=0;
 
+  clrtobot();
   while (matches[i].index > -1) {
     print_hit_highlight_kw(i);
     ++i;
