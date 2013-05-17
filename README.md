@@ -3,15 +3,16 @@ Artemis
 Nifty prompt for searching strings.  
 "Let the hunt begin... and end quickly!"
 
-Features
-========
+Features / Docs
+===============
 * small/fast/low-dependency (ncurses)
 * searching is case-insensitive
-* results displayed as !: <chosen strings>
-* strings from flat-file or stdin
-* dumps choice to stdout or file
 * tab-completion of strings/searching
 * arrow-up/down or Shift-J,K to scroll through results
+* results displayed as !: <chosen strings>
+* <space> resets current search
+* strings from flat-file or stdin
+* dumps choice to stdout or file
 
 Building
 ========
@@ -19,9 +20,9 @@ gcc main.c -ncurses -o artemis
 
 Todo
 ====
-* ESC-some key to reset search quickly
 * dynamic memory mgmt
 * command-line arguments/file-io
+* search the hits after tab-list (search matches)
 * demo
 
 License
