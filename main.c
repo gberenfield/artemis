@@ -26,6 +26,7 @@ struct match matches[100];
 int sel_match;                // currently selected match
 int num_matches;              // number of matches
 char *choice;                 // choice of selection/typing
+char items[MAX_LINE];       // all choices, space-delimited
 
 int flen(char fname[])
 {
@@ -65,6 +66,7 @@ void setup_screen() /* print the message at the center of the screen */
   mywin=initscr();
   idcok(mywin, 1);
   idlok(mywin, 1);
+  mvprintw(LINES - 2, 0, "!: %s", items);
   getmaxyx(stdscr,row,col);/* get the number of rows and columns */
   cursor_row = row/5;
   cursor_col = (col-strlen(mesg))/4;
@@ -100,29 +102,39 @@ void hunt_current()
   }
 }
 
+void print_hit_highlight_kw(int i)
+{
+  // i is the relative row position from the first (0) hit item
+  char front[128],back[128];
+
+  memset(front,'\0',128);
+  memset(back,'\0',128);
+  strncpy(front,tags[matches[i].index],matches[i].sloc-tags[matches[i].index]);
+  strcpy(back,&tags[matches[i].index][strlen(front)+strlen(current)]);
+  mvprintw((cursor_row+2+i),cursor_col,"%s",front);
+  attron(A_UNDERLINE);
+  printw("%s",current);
+  attroff(A_UNDERLINE);
+  printw("%s",back);
+}
+
 void show_hits()
 {
   int i=0;
-  char front[128],back[128];
 
+  clrtobot();
   while (matches[i].index > -1) {
-    memset(front,'\0',128);
-    memset(back,'\0',128);
-    strncpy(front,tags[matches[i].index],matches[i].sloc-tags[matches[i].index]);
-    strcpy(back,&tags[matches[i].index][strlen(front)+strlen(current)]);
-    mvprintw((cursor_row+2+i),cursor_col,"%s",front);
-    attron(A_BOLD);
-    printw("%s",current);
-    attroff(A_BOLD);
-    printw("%s",back);
+    print_hit_highlight_kw(i);
     ++i;
   }
   showing=TRUE;
+  mvprintw(LINES - 2, 0, "!: %s", items);
   move(cursor_row,cursor_col);
   refresh();
 }
 
-void backspace() {
+void backspace()
+{
   noecho();
   noraw();
   move(cursor_row,cursor_col-1);
@@ -130,7 +142,9 @@ void backspace() {
   raw();
   refresh();
   getsyx(cursor_row,cursor_col);
+  move(cursor_row,cursor_col);
 }
+
 void tab_hits_down() {
   if (sel_match < (num_matches-1)) {
     sel_match++;
@@ -140,7 +154,7 @@ void tab_hits_down() {
     }
     else {
       move (hit_row,hit_col);
-      printw(tags[matches[sel_match-1].index]);
+      print_hit_highlight_kw(sel_match-1);
     }
     move (++hit_row,hit_col);
     clrtoeol();
@@ -150,11 +164,12 @@ void tab_hits_down() {
     move(cursor_row,cursor_col);
   }
 }
+
 void tab_hits_up() {
   if (sel_match > 0) {
     sel_match--;
     move (hit_row,hit_col);
-    printw(tags[matches[sel_match+1].index]);
+    print_hit_highlight_kw(sel_match+1);
     move (--hit_row,hit_col);
     clrtoeol();
     attron(A_REVERSE);
@@ -166,17 +181,17 @@ void tab_hits_up() {
 
 void get_current()
 {
-  int c,lc , i=0;
+  int c,lc,i=0;
 
   raw();
   noecho();
   keypad(stdscr, TRUE);
 
-  while ((c=getch()) != '\n')
+  while ((c=getch()))
   {
     getsyx(cursor_row,cursor_col);
-    if (c == '\t') {
-      if (lc == '\t' || lc == 'J' || lc == 353 || lc == 'K') { tab_hits_down(); }
+    if (c == '\t') { // Tab or 'J'
+      if (lc == '\t' || showing || lc == 'J' || lc == 353 || lc == 'K') { tab_hits_down(); }
       else {
         clrtobot();
         if (strlen(current)>1) {
@@ -185,24 +200,47 @@ void get_current()
         }
       }
     }
+    else if (c == '\n' && lc == '\n') break;
     else if (c == 'J') tab_hits_down();
     else if (c == 'K' || c == 353) tab_hits_up();
-    else if (c == 127 || c == 8) { // delete or backspace
+    else if (c == 127 || c == 8) { // DELETE or BACKSPACE
       backspace();
       i--;
       current[i] = '\0';
       clrtobot();
+      mvprintw(LINES - 2, 0, "!: %s", items);
+      move(cursor_row,cursor_col);
       if (showing && strlen(current)>1) {
         hunt_current();
         show_hits();
       }
     }
+    else if (c=='\n') // select hightlighted hit or typed word
+    {
+      if (showing && sel_match>-1) strcat(items,tags[matches[sel_match].index]);
+      else strcat(items,current);
+      clrtobot();
+      showing=FALSE;
+      strcat(items," ");
+      mvprintw(LINES - 2, 0, "!: %s", items);
+      move(cursor_row,cursor_col);
+    }
     else {
       addch(c);
       current[i]=c;
       i++;
-      if (showing) clrtobot();
-      showing=FALSE;
+      if (showing && strlen(current)>1) {
+        noecho();
+        noraw();
+        move(cursor_row,cursor_col+1);
+        delch();
+        raw();
+        refresh();
+        getsyx(cursor_row,cursor_col);
+        hunt_current();
+        show_hits();
+      }
+      else showing=FALSE;
     }
     lc = c;
   }
@@ -225,10 +263,10 @@ int main(int argc, const char * argv[])
   endwin();
 
   if (showing && sel_match>-1) {
-    choice = tags[matches[sel_match].index];
+    choice = items;
   }
   else choice = current;
-  printf("%s\n",choice);
+  printf("%s\n",items);
   return 0;
 }
 
