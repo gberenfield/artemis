@@ -24,6 +24,7 @@ Todo
 * command-line arguments/file-io
 * search the hits after tab-list (search matches)
 * demo
+* ansi color?
 
 License
 =======
