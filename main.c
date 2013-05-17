@@ -64,6 +64,7 @@ void setup_screen() /* print the message at the center of the screen */
   char mesg[]="?: "; /* message to be appeared onn the screen */
 
   mywin=initscr();
+  clear();
   idcok(mywin, 1);
   idlok(mywin, 1);
   mvprintw(LINES - 2, 0, "!: %s", items);
@@ -77,6 +78,8 @@ void clear_matches()
 {
   int i;
 
+  sel_match = -1;
+  num_matches = 0;
   for (i=0;i<100;i++) {
     matches[i].index=-1;
     matches[i].sloc=NULL;
@@ -89,8 +92,6 @@ void hunt_current()
   char *k;
 
   clear_matches();
-  sel_match = -1;
-  num_matches = 0;
 
   for (i=0;i<num_tags;i++) {
     if ((k=strcasestr(tags[i],current)) != NULL) {
@@ -122,7 +123,6 @@ void show_hits()
 {
   int i=0;
 
-  clrtobot();
   while (matches[i].index > -1) {
     print_hit_highlight_kw(i);
     ++i;
@@ -179,6 +179,13 @@ void tab_hits_up() {
   }
 }
 
+void diag(int c) {
+  getsyx(cursor_row,cursor_col);
+  mvprintw(LINES - 5, 0, "current: %s", current);
+  mvprintw(LINES - 4, 0, "c: %d", c);
+  move(cursor_row,cursor_col);
+}
+
 void get_current()
 {
   int c,lc,i=0;
@@ -190,6 +197,7 @@ void get_current()
   while ((c=getch()))
   {
     getsyx(cursor_row,cursor_col);
+    /* diag(c); */
     if (c == '\t') { // Tab or 'J'
       if (lc == '\t' || showing || lc == 'J' || lc == 353 || lc == 'K') { tab_hits_down(); }
       else {
@@ -203,6 +211,14 @@ void get_current()
     else if (c == '\n' && lc == '\n') break;
     else if (c == 'J') tab_hits_down();
     else if (c == 'K' || c == 353) tab_hits_up();
+    else if (c == 32) { // SPACE to reset search
+      memset(current,'\0',MAX_LINE);
+      clear_matches();
+      setup_screen();
+      mvprintw(LINES - 2, 0, "!: %s", items);
+      move(cursor_row,cursor_col+3);
+      i=0;
+    }
     else if (c == 127 || c == 8) { // DELETE or BACKSPACE
       backspace();
       i--;
