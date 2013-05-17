@@ -271,11 +271,6 @@ int main(int argc, const char * argv[])
   setup_screen();
   get_current();
 
-  /* mvprintw(LINES - 4, 0, "tag: %s", tags[0]); */
-  /* mvprintw(LINES - 3, 0, "You Entered: %s", choice); */
-  /* mvprintw(LINES - 2, 0, "Number of tags: %d", num_tags); */
-  /* getch(); */
-
   endwin();
 
   if (showing && sel_match>-1) {
