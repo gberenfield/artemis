@@ -1,6 +1,6 @@
 Artemis
 =======
-Nifty prompt for searching strings.
+Nifty prompt for searching strings.  
 "Let the hunt begin... and end quickly!"
 
 Features
