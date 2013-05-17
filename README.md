@@ -21,7 +21,7 @@ Building
 Demo
 ====
     ./artemis -f demo.txt
-Then try typing "ge<return><return"
+Then try typing `ge<return><return`
 
 Todo
 ====
