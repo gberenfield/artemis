@@ -23,7 +23,7 @@ Demo / Usage
     ./artemis -f demo.txt
 Then try typing `ge<return><return`
 
-
+  
     ./artemis -o output.txt "ashen benign caustic finite zodiac"
 N.B. The word-list has to be both space-separated, and the last argument
 
