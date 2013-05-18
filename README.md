@@ -18,14 +18,11 @@ Building
 ========
     gcc main.c -ncurses -o artemis
 
-Demo
-====
-1.
-
+Demo / Usage
+============
     ./artemis -f demo.txt
 Then try typing `ge<return><return`
 
-2.
 
     ./artemis -o output.txt "ashen benign caustic finite zodiac"
 N.B. The word-list has to be both space-separated, and the last argument
