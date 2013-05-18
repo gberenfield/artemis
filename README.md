@@ -18,8 +18,8 @@ Nifty prompt for searching strings.
 
     gcc main.c -ncurses -o artemis
 
-Demo / Usage
-============
+## Demo / Usage
+
     ./artemis -f demo.txt
 Then try typing `ge<return><return`
 
