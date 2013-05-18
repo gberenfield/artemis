@@ -275,17 +275,19 @@ void get_current()
 
 void show_basics()
 {
-  printf("artemis - (C) 2013 Greg Berenfield\nReleased under the GNU GPL.\n\nUsage: artemis [-o <output>] [-f <word-file> | \"string of words\"]\n");
+  printf("artemis - (C) 2013 Greg Berenfield\nReleased under the GNU GPL.\n\nUsage: artemis [-o <output>] [-f <word-file> | \"string of space-separated words\"]\n");
 }
 
 int main(int argc, const char * argv[])
 {
   int i;
-  if (argc==1) {
+  if (argc==1)                  // no arguments
+  {
     show_basics();
     return 0;
   }
-  for (i = 1; i < argc; i++) {
+  for (i = 1; i < argc; i++)    // parse arguments
+  {
     if (argv[i][0] == '-') {
       switch (argv[i][1]) {
         case 'f':strcpy(infile,argv[++i]); break;
@@ -294,22 +296,32 @@ int main(int argc, const char * argv[])
     }
   }
 
-  if (strlen(infile)>0) {
+  if (strlen(infile)>0)         // read file for tags
+  {
     num_tags=flen(infile);
     get_file(tags);
   }
-  else {
-
+  else                          // read string from stdin for tags
+  {
+    i=0;
+    char *s,t[MAX_LINE*2];
+    strcpy(t,argv[argc-1]);
+    s=strtok(t," ");
+    while (s != NULL)
+    {
+      strcpy(tags[i],s);
+      s = strtok (NULL, " ");
+      ++i;
+    }
+    num_tags=i;
   }
 
   setup_screen();
   get_current();
-  items[strlen(items)-1]='\0';
+  items[strlen(items)-1]='\0';  // remove trailing space-separation char
   endwin();
 
-  if (showing && sel_match>-1) {
-    choice = items;
-  }
+  if (showing && sel_match>-1) choice = items;
   else choice = current;
 
   if (strlen(outfile)>0) put_file();
