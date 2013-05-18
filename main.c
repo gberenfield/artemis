@@ -5,6 +5,7 @@
 //  Copyright 2013 Greg Berenfield
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
 
@@ -21,7 +22,9 @@ int num_tags;                      // The file length of the tags file (# of tag
 int row,col,cursor_row,cursor_col,hit_row,hit_col;
 bool showing;                      // Are we displaying the hunt_list ?
 WINDOW *mywin;
-char tags[1000][MAX_LINE];
+char **tags;
+/* char *tags[MAX_LINE]; */
+/* char tags[1000][MAX_LINE]; */
 struct match matches[100];
 int sel_match;                     // currently selected match
 int num_matches;                   // number of matches
@@ -41,17 +44,23 @@ int flen(char fname[])
     lineCount++;
   }
   fclose(inFile);
-  return lineCount;
+  return (lineCount-1);
 }
 
-void get_file(char tags[][MAX_LINE])
+void get_file()
 {
   FILE *inFile;
-  int i;
+  char str[MAX_LINE];
+  size_t i;
 
   inFile = fopen(infile, "r");
-  for(i = 0; i < num_tags; i++)
-    fscanf(inFile, "%s", tags[i]);
+  tags = malloc(sizeof(*tags) * num_tags);
+  for(i = 0; i <= num_tags; i++)
+  {
+    fscanf(inFile, "%s", str);
+    tags[i]=(char *)malloc(sizeof(char *) * (strlen(str)+1));
+    strcpy(tags[i],str);
+  }
   fclose(inFile);
 }
 
@@ -93,12 +102,12 @@ void clear_matches()
 
 void hunt_current()
 {
-  int i,j=0;
+  size_t i,j=0;
+  char str[MAX_LINE];
   char *k;
 
   clear_matches();
-
-  for (i=0;i<num_tags;i++) {
+  for (i=0;i<=num_tags;i++) {
     if ((k=strcasestr(tags[i],current)) != NULL) {
       matches[j].index=i;
       matches[j].sloc=k;
@@ -203,7 +212,7 @@ void get_current()
   while ((c=getch()))
   {
     getsyx(cursor_row,cursor_col);
-    /* diag(c); */
+    diag(c);
     if (c == '\t')                                // Tab
     {
       if (lc == '\t' || showing || lc == 'J' || lc == 353 || lc == 'K') { tab_hits_down(); }
@@ -299,7 +308,7 @@ int main(int argc, const char * argv[])
   if (strlen(infile)>0)         // read file for tags
   {
     num_tags=flen(infile);
-    get_file(tags);
+    get_file();
   }
   else                          // read string from stdin for tags
   {
@@ -326,6 +335,10 @@ int main(int argc, const char * argv[])
 
   if (strlen(outfile)>0) put_file();
   else printf("%s\n",items);
+
+  // be kind and free up allocations
+  for(i = 0; i <= num_tags; i++) free(tags[i]); // free tags
+  free(tags);
 
   return 0;
 }
