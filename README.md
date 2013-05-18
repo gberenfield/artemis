@@ -28,6 +28,8 @@ N.B. The word-list has to be both space-separated, and the last argument
 
 ## Todo
 
+* hitting enter once to select a hit should reset the search like
+  space-bar
 * dynamic memory mgmt: tags,match
 * search the hits after tab-list (search matches)
 * ansi color?
