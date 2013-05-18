@@ -1,10 +1,10 @@
-Artemis
-=======
+# Artemis
+
 Nifty prompt for searching strings.  
 "Let the hunt begin... and end quickly!"
 
-Features / Docs
-===============
+## Features / Docs
+
 * small/fast/low-dependency (ncurses)
 * searching is case-insensitive
 * tab-completion of strings/searching
@@ -14,8 +14,8 @@ Features / Docs
 * strings from flat-file or stdin
 * dumps choice to stdout or file
 
-Building
-========
+## Building
+
     gcc main.c -ncurses -o artemis
 
 Demo / Usage
@@ -26,13 +26,13 @@ Then try typing `ge<return><return`
     ./artemis -o output.txt "ashen benign caustic finite zodiac"
 N.B. The word-list has to be both space-separated, and the last argument
 
-Todo
-====
+## Todo
+
 * dynamic memory mgmt: tags,match
 * search the hits after tab-list (search matches)
 * ansi color?
 
-License
-=======
+## License
+
 GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007  
 Copyright © 2013 Greg Berenfield
