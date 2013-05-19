@@ -8,7 +8,7 @@ Nifty prompt for searching strings.
 * small/fast/low-dependency (ncurses)
 * searching is case-insensitive
 * tab-completion of strings/searching
-* arrow-up/down or Shift-J,K to scroll through results
+* arrow-up/down, Tab/Shift-Tab, or Shift-J,K to scroll through results
 * results displayed as !: <chosen strings>
 * <space> resets current search
 * strings from flat-file or stdin

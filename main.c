@@ -228,8 +228,10 @@ void get_current()
       }
     }
     else if (c == '\n' && lc == '\n') break;      // two-returns to quit
-    else if (c == 'J') tab_hits_down();           // J down hit list
-    else if (c == 'K' || c == 353) tab_hits_up(); // K | <shift-TAB> up hit list
+    else if (c == 'J' || c == 258)                // J | d-arrow down hit list
+      tab_hits_down();
+    else if (c == 'K' || c == 353 || c == 259)    // K | <shift-TAB> | u-arrow up hit list
+      tab_hits_up(); 
     else if (c == 32)                             // SPACE to reset search
     {
       memset(current,'\0',MAX_LINE);
