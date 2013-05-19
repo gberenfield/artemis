@@ -217,7 +217,7 @@ void get_current()
     /* diag(c); */
     if (c == '\t')                                // Tab
     {
-      if (lc == '\t' || showing || lc == 'J' || lc == 353 || lc == 'K') { tab_hits_down(); }
+      if (lc == '\t' || showing || lc == 'J' || lc == 353 || lc == 'K') tab_hits_down();
       else {
         clrtobot();
         if (strlen(current)>1) {
@@ -255,11 +255,13 @@ void get_current()
     {
       if (showing && sel_match>-1) strcat(items,tags[matches[sel_match].index]);
       else strcat(items,current);
-      clrtobot();
+      memset(current,'\0',MAX_LINE);
+      i=0;
+      setup_screen();
       showing=FALSE;
       strcat(items," ");
       mvprintw(LINES - 2, 0, "!: %s", items);
-      move(cursor_row,cursor_col);
+      move(cursor_row,cursor_col+3);
     }
     else                                          // regular key-typed
     {
