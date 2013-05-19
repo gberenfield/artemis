@@ -217,12 +217,13 @@ void get_current()
     /* diag(c); */
     if (c == '\t')                                // Tab
     {
-      if (lc == '\t' || showing || lc == 'J' || lc == 353 || lc == 'K') tab_hits_down();
+      if (showing) tab_hits_down();
       else {
         clrtobot();
         if (strlen(current)>1) {
           hunt_current();
           show_hits();
+          tab_hits_down();
         }
       }
     }
