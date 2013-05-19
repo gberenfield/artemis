@@ -30,7 +30,6 @@ N.B. The word-list has to be both space-separated, and the last argument
 
 * hitting enter once to select a hit should reset the search like
   space-bar
-* dynamic memory mgmt: match
 * search the hits after tab-list (search matches)
 * ansi color?
 
