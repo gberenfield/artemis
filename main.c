@@ -104,7 +104,6 @@ void hunt_current()
   char str[MAX_LINE];
   char *k;
 
-  matches = malloc(num_tags * sizeof(struct match));
   clear_matches();
   for (i=0;i<=num_tags;i++) {
     if ((k=strcasestr(tags[i],current)) != NULL) {
@@ -159,7 +158,8 @@ void backspace()
   move(cursor_row,cursor_col);
 }
 
-void tab_hits_down() {
+void tab_hits_down()
+{
   if (sel_match < (num_matches-1)) {
     sel_match++;
     if (sel_match==0) {
@@ -179,7 +179,8 @@ void tab_hits_down() {
   }
 }
 
-void tab_hits_up() {
+void tab_hits_up()
+{
   if (sel_match > 0) {
     sel_match--;
     move (hit_row,hit_col);
@@ -193,8 +194,10 @@ void tab_hits_up() {
   }
 }
 
-void diag(int c) {
+void diag(int c)
+{
   getsyx(cursor_row,cursor_col);
+  mvprintw(LINES - 6, 0, "sizeof matches: %d", sizeof(matches));
   mvprintw(LINES - 5, 0, "current: %s", current);
   mvprintw(LINES - 4, 0, "c: %d", c);
   move(cursor_row,cursor_col);
@@ -211,7 +214,7 @@ void get_current()
   while ((c=getch()))
   {
     getsyx(cursor_row,cursor_col);
-    diag(c);
+    /* diag(c); */
     if (c == '\t')                                // Tab
     {
       if (lc == '\t' || showing || lc == 'J' || lc == 353 || lc == 'K') { tab_hits_down(); }
@@ -323,6 +326,7 @@ int main(int argc, const char * argv[])
     }
     num_tags=i;
   }
+  matches = malloc(num_tags * sizeof(struct match));
 
   setup_screen();
   get_current();
