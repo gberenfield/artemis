@@ -21,11 +21,9 @@ char current[MAX_LINE];            // The current text being typed for search
 int num_tags;                      // The file length of the tags file (# of tags)
 int row,col,cursor_row,cursor_col,hit_row,hit_col;
 bool showing;                      // Are we displaying the hunt_list ?
-WINDOW *mywin;
-char **tags;
-/* char *tags[MAX_LINE]; */
-/* char tags[1000][MAX_LINE]; */
-struct match matches[100];
+WINDOW *mywin;                     // curses window
+char **tags;                       // set of tags to search
+struct match *matches;             // set of matched tags from current search
 int sel_match;                     // currently selected match
 int num_matches;                   // number of matches
 char *choice;                      // choice of selection/typing
@@ -106,6 +104,7 @@ void hunt_current()
   char str[MAX_LINE];
   char *k;
 
+  matches = malloc(num_tags * sizeof(struct match));
   clear_matches();
   for (i=0;i<=num_tags;i++) {
     if ((k=strcasestr(tags[i],current)) != NULL) {
@@ -339,6 +338,7 @@ int main(int argc, const char * argv[])
   // be kind and free up allocations
   for(i = 0; i <= num_tags; i++) free(tags[i]); // free tags
   free(tags);
+  free(matches);
 
   return 0;
 }
