@@ -250,6 +250,7 @@ void get_current()
       if (showing && strlen(current)>1) {
         hunt_current();
         show_hits();
+        tab_hits_down();
       }
     }
     else if (c=='\n')                             // SELECT hightlighted hit or typed word
@@ -279,6 +280,7 @@ void get_current()
         getsyx(cursor_row,cursor_col);
         hunt_current();
         show_hits();
+        tab_hits_down();
       }
       else showing=FALSE;
     }
