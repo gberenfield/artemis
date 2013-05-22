@@ -28,6 +28,7 @@ N.B. The word-list has to be both space-separated, and the last argument
 
 ## Todo
 
+* cancel search
 * search the hits after tab-list (search matches)
 * ansi color?
 
