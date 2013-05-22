@@ -18,15 +18,14 @@ struct match {
 
 char infile[128],outfile[128];     // input and output filenames
 char current[MAX_LINE];            // The current text being typed for search
-int num_tags;                      // The file length of the tags file (# of tags)
+int num_tags=0;                    // The file length of the tags file (# of tags)
 int row,col,cursor_row,cursor_col,hit_row,hit_col;
 bool showing;                      // Are we displaying the hunt_list ?
 WINDOW *mywin;                     // curses window
 char **tags;                       // set of tags to search
 struct match *matches;             // set of matched tags from current search
 int sel_match;                     // currently selected match
-int num_matches;                   // number of matches
-char *choice;                      // choice of selection/typing
+int num_matches=0;                 // number of matches
 char items[MAX_LINE*2];            // all choices, space-delimited
 
 int flen(char fname[])
@@ -53,7 +52,7 @@ void get_file()
 
   inFile = fopen(infile, "r");
   tags = malloc(sizeof(*tags) * num_tags);
-  for(i = 0; i <= num_tags; i++)
+  for(i = 0; i < num_tags; i++)
   {
     fscanf(inFile, "%s", str);
     tags[i]=(char *)malloc(sizeof(char *) * (strlen(str)+1));
@@ -88,11 +87,11 @@ void setup_screen() /* print the message at the center of the screen */
 
 void clear_matches()
 {
-  int i;
+  size_t i;
 
   sel_match = -1;
   num_matches = 0;
-  for (i=0;i<100;i++) {
+  for (i=0;i<num_matches;i++) {
     matches[i].index=-1;
     matches[i].sloc=NULL;
   }
@@ -105,7 +104,7 @@ void hunt_current()
   char *k;
 
   clear_matches();
-  for (i=0;i<=num_tags;i++) {
+  for (i=0;i<num_tags;i++) {
     if ((k=strcasestr(tags[i],current)) != NULL) {
       matches[j].index=i;
       matches[j].sloc=k;
@@ -115,7 +114,7 @@ void hunt_current()
   }
 }
 
-void print_hit_highlight_kw(int i)
+void print_hit_highlight_kw(size_t i)
 {
   // i is the relative row position from the first (0) hit item
   char front[128],back[128];
@@ -133,10 +132,10 @@ void print_hit_highlight_kw(int i)
 
 void show_hits()
 {
-  int i=0;
+  size_t i=0;
 
   clrtobot();
-  while (matches[i].index > -1) {
+  while (i<num_matches) {
     print_hit_highlight_kw(i);
     ++i;
   }
@@ -197,6 +196,8 @@ void tab_hits_up()
 void diag(int c)
 {
   getsyx(cursor_row,cursor_col);
+  mvprintw(LINES - 8, 0, "# tags: %d", num_tags);
+  mvprintw(LINES - 7, 0, "# matches: %d", num_matches);
   mvprintw(LINES - 6, 0, "sizeof matches: %d", sizeof(matches));
   mvprintw(LINES - 5, 0, "current: %s", current);
   mvprintw(LINES - 4, 0, "c: %d", c);
@@ -298,7 +299,7 @@ void show_basics()
 
 int main(int argc, const char * argv[])
 {
-  int i;
+  size_t i;
   if (argc==1)                  // no arguments
   {
     show_basics();
@@ -333,6 +334,7 @@ int main(int argc, const char * argv[])
     }
     num_tags=i;
   }
+
   matches = malloc(num_tags * sizeof(struct match));
 
   setup_screen();
@@ -340,14 +342,11 @@ int main(int argc, const char * argv[])
   items[strlen(items)-1]='\0';  // remove trailing space-separation char
   endwin();
 
-  if (showing && sel_match>-1) choice = items;
-  else choice = current;
-
   if (strlen(outfile)>0) put_file();
   else printf("%s\n",items);
 
   // be kind and free up allocations
-  for(i = 0; i <= num_tags; i++) free(tags[i]); // free tags
+  for(i = 0; i < num_tags; i++) free(tags[i]); // free tags
   free(tags);
   free(matches);
 
