@@ -18,6 +18,7 @@ struct match {
 
 char infile[128],outfile[128];     // input and output filenames
 char current[MAX_LINE];            // The current text being typed for search
+int current_length;                // string-length of the current type text
 int num_tags=0;                    // The file length of the tags file (# of tags)
 int row,col,cursor_row,cursor_col,hit_row,hit_col;
 bool showing;                      // Are we displaying the hunt_list ?
@@ -147,14 +148,12 @@ void show_hits()
 
 void backspace()
 {
-  noecho();
   noraw();
   move(cursor_row,cursor_col-1);
   delch();
   raw();
   refresh();
   getsyx(cursor_row,cursor_col);
-  move(cursor_row,cursor_col);
 }
 
 void tab_hits_down()
@@ -196,11 +195,13 @@ void tab_hits_up()
 void diag(int c)
 {
   getsyx(cursor_row,cursor_col);
+  mvprintw(LINES - 9, 0, "row:%d col:%d", cursor_row,cursor_col);
   mvprintw(LINES - 8, 0, "# tags: %d", num_tags);
   mvprintw(LINES - 7, 0, "# matches: %d", num_matches);
   mvprintw(LINES - 6, 0, "sizeof matches: %d", sizeof(matches));
   mvprintw(LINES - 5, 0, "current: %s", current);
-  mvprintw(LINES - 4, 0, "c: %d", c);
+  mvprintw(LINES - 4, 0, "len(current): %d", strlen(current));
+  mvprintw(LINES - 3, 0, "c: %d", c);
   move(cursor_row,cursor_col);
 }
 
@@ -214,14 +215,12 @@ void get_current()
 
   while ((c=getch()))
   {
-    getsyx(cursor_row,cursor_col);
-    /* diag(c); */
     if (c == '\t')                                // Tab
     {
-      if (showing) tab_hits_down();
+      if (showing)  tab_hits_down();
       else {
         clrtobot();
-        if (strlen(current)>1) {
+        if (current_length > 1) {
           hunt_current();
           show_hits();
           tab_hits_down();
@@ -236,24 +235,31 @@ void get_current()
     else if (c == 32)                             // SPACE to reset search
     {
       memset(current,'\0',MAX_LINE);
+      current_length = 0;
       clear_matches();
       setup_screen();
       mvprintw(LINES - 2, 0, "!: %s", items);
       move(cursor_row,cursor_col+3);
+      refresh();
       i=0;
     }
     else if (c == 127 || c == 8)                  // DELETE or BACKSPACE
     {
-      backspace();
-      i--;
-      current[i] = '\0';
-      clrtobot();
-      mvprintw(LINES - 2, 0, "!: %s", items);
-      move(cursor_row,cursor_col);
-      if (showing && strlen(current)>1) {
-        hunt_current();
-        show_hits();
-        tab_hits_down();
+      if (current_length > 0 )
+      {
+        i--;
+        current_length--;
+        current[i] = '\0';
+        clrtobot();
+        mvprintw(LINES - 2, 0, "!: %s", items);
+        backspace();
+        move(cursor_row,cursor_col);
+        getsyx(cursor_row,cursor_col);
+        if (showing && current_length > 1) {
+          hunt_current();
+          show_hits();
+          tab_hits_down();
+        }
       }
     }
     else if (c=='\n')                             // SELECT hightlighted hit or typed word
@@ -267,20 +273,21 @@ void get_current()
       strcat(items," ");
       mvprintw(LINES - 2, 0, "!: %s", items);
       move(cursor_row,cursor_col+3);
+      refresh();
     }
     else                                          // regular key-typed
     {
       addch(c);
       current[i]=c;
-      i++;
-      if (showing && strlen(current)>1) {
-        noecho();
+      ++i;
+      ++current_length;
+      refresh();
+      getsyx(cursor_row,cursor_col);
+      if (showing && (current_length > 1)) {
         noraw();
-        move(cursor_row,cursor_col+1);
         delch();
         raw();
         refresh();
-        getsyx(cursor_row,cursor_col);
         hunt_current();
         show_hits();
         tab_hits_down();
@@ -288,6 +295,7 @@ void get_current()
       else showing=FALSE;
     }
     lc = c;
+    /* diag(c); */
   }
   current[i] = '\0';
 }
