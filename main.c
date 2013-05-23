@@ -22,6 +22,7 @@ int current_length;                // string-length of the current type text
 int num_tags=0;                    // The file length of the tags file (# of tags)
 int row,col,cursor_row,cursor_col,hit_row,hit_col;
 bool showing;                      // Are we displaying the hunt_list ?
+bool diags;                        // show diagnostics?
 WINDOW *mywin;                     // curses window
 char **tags;                       // set of tags to search
 struct match *matches;             // set of matched tags from current search
@@ -200,7 +201,7 @@ void diag(int c)
   mvprintw(LINES - 7, 0, "# matches: %d", num_matches);
   mvprintw(LINES - 6, 0, "sizeof matches: %d", sizeof(matches));
   mvprintw(LINES - 5, 0, "current: %s", current);
-  mvprintw(LINES - 4, 0, "len(current): %d", strlen(current));
+  mvprintw(LINES - 4, 0, "current_len: %d", current_length);
   mvprintw(LINES - 3, 0, "c: %d", c);
   move(cursor_row,cursor_col);
 }
@@ -267,7 +268,7 @@ void get_current()
       if (showing && sel_match>-1) strcat(items,tags[matches[sel_match].index]);
       else strcat(items,current);
       memset(current,'\0',MAX_LINE);
-      i=0;
+      current_length=i=0;
       setup_screen();
       showing=FALSE;
       strcat(items," ");
@@ -295,7 +296,7 @@ void get_current()
       else showing=FALSE;
     }
     lc = c;
-    /* diag(c); */
+    if (diags) diag(c);
   }
   current[i] = '\0';
 }
@@ -319,6 +320,7 @@ int main(int argc, const char * argv[])
       switch (argv[i][1]) {
         case 'f':strcpy(infile,argv[++i]); break;
         case 'o':strcpy(outfile,argv[++i]); break;
+        case 'd':diags=TRUE; break;
       }
     }
   }
