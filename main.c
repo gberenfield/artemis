@@ -29,6 +29,20 @@ struct match *matches;             // set of matched tags from current search
 int sel_match;                     // currently selected match
 int num_matches=0;                 // number of matches
 char items[MAX_LINE*2];            // all choices, space-delimited
+int exiting=0;                     // are we just escaping out?
+
+int num_splits(char s[])
+{
+  char *f;
+  int i=0;
+
+  f = strtok(s," ");
+  while (f != NULL) {
+    ++i;
+    f = strtok(NULL," ");
+  }
+  return i;
+}
 
 int flen(char fname[])
 {
@@ -229,6 +243,7 @@ void get_current()
       }
     }
     else if (c == '\n' && lc == '\n') break;      // two-returns to quit
+    else if (c == 27) { exiting=1;break;break; }            // ESC quit
     else if (c == 'J' || c == 258)                // J | d-arrow down hit list
       tab_hits_down();
     else if (c == 'K' || c == 353 || c == 259)    // K | <shift-TAB> | u-arrow up hit list
@@ -324,7 +339,6 @@ int main(int argc, const char * argv[])
       }
     }
   }
-
   if (strlen(infile)>0)         // read file for tags
   {
     num_tags=flen(infile);
@@ -333,12 +347,15 @@ int main(int argc, const char * argv[])
   else                          // read string from stdin for tags
   {
     i=0;
-    char *s,t[MAX_LINE*2];
-    strcpy(t,argv[argc-1]);
-    s=strtok(t," ");
+    char *s,*t,*nt;
+    t = strdup(argv[argc-1]);   // string of tags, space-delimted
+    nt = strdup(argv[argc-1]);
+    num_tags = num_splits(nt);
+    tags = malloc(sizeof(*tags) * num_tags);
+    s=strtok(t," "); // ashen
     while (s != NULL)
     {
-      strcpy(tags[i],s);
+      tags[i] = strdup(s);
       s = strtok (NULL, " ");
       ++i;
     }
@@ -352,11 +369,14 @@ int main(int argc, const char * argv[])
   items[strlen(items)-1]='\0';  // remove trailing space-separation char
   endwin();
 
-  if (strlen(outfile)>0) put_file();
-  else printf("%s\n",items);
+  if (!exiting) {
+    if (strlen(outfile)>0) put_file();
+    else printf("%s\n",items);
+  }
 
   // be kind and free up allocations
-  for(i = 0; i < num_tags; i++) free(tags[i]); // free tags
+  for(i = 0; i < num_tags; i++) free(tags[i]);
+  // free tags
   free(tags);
   free(matches);
 
