@@ -13,6 +13,7 @@ Nifty prompt for searching strings.
 * <space> resets current search
 * strings from flat-file or stdin
 * dumps choice to stdout or file
+* ESC 2-times to cancel search with no selection
 
 ## Building
 
@@ -28,7 +29,6 @@ N.B. The word-list has to be both space-separated, and the last argument
 
 ## Todo
 
-* cancel search
 * search the hits after tab-list (search matches)
 * ansi color?
 
