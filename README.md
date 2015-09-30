@@ -17,7 +17,7 @@ Nifty prompt for searching strings.
 
 ## Building
 
-    gcc main.c -ncurses -o artemis
+    gcc main.c -lncurses -o artemis
 
 ## Demo / Usage
 
